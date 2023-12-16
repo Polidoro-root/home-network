@@ -1,0 +1,9 @@
+---
+- hosts: servers
+  become: yes
+  roles:
+    - install_docker
+    - install_pihole
+    # - install_cloudflared
+    # - install_prometheus
+    # - install_grafana
