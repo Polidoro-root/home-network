@@ -3,6 +3,8 @@
   apt:
     name:
       - apt-transport-https
+      - software-properties-common
+      - wget
       - ca-certificates
       - curl
       - gnupg
@@ -10,6 +12,7 @@
       - python3-pip
       - virtualenv
       - python3-setuptools
+      - resolvconf
     state: present
     update_cache: yes
 

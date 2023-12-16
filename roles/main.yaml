@@ -4,6 +4,6 @@
   roles:
     - install_docker
     - install_pihole
-    # - install_cloudflared
-    # - install_prometheus
-    # - install_grafana
+    - install_cloudflared
+    - install_prometheus
+    - install_grafana

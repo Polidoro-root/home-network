@@ -1,2 +1,51 @@
 ---
-# tasks file for install_cloudflared
+- name: download cloudflared .deb package
+  become: true
+  ansible.builtin.apt:
+    deb: https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+    update_cache: true
+    state: present
+
+- name: setup cloudflared user
+  ansible.builtin.user:
+    name: cloudflared
+    state: present
+    create_home: false
+    shell: /usr/sbin/nologin
+    system: true
+
+- name: setup cloudflared configuration file
+  become: true
+  copy:
+    src: cloudflared
+    dest: /etc/default/cloudflared
+    owner: cloudflared
+
+- name: update cloudflared program owner
+  become: true
+  ansible.builtin.file:
+    owner: cloudflared
+    path: /usr/local/bin/cloudflared
+
+- name: copy cloudflared.service script
+  become: true
+  copy:
+    src: cloudflared.service
+    dest: /etc/systemd/system/cloudflared.service
+    owner: root
+
+- name: enable cloudflared on startup
+  become: true
+  ansible.builtin.systemd_service:
+    state: started
+    enabled: true
+    daemon_reload: true
+    name: cloudflared
+
+- name: enable cloudflared autoupdate
+  become: true
+  ansible.builtin.copy:
+    src: cloudflared-updater
+    dest: /etc/cron.weekly/cloudflared-updater
+    owner: root
+    mode: +x

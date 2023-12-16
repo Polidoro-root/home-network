@@ -1,2 +1,11 @@
 ---
-# tasks file for install_prometheus
+- name: setup prometheus
+  ansible.builtin.include_role:
+    name: prometheus.prometheus.prometheus
+  vars:
+    prometheus_config_file: prometheus.yml
+    prometheus_storage_retention: 7d
+
+- name: setup node exporter
+  ansible.builtin.include_role:
+    name: prometheus.prometheus.node_exporter

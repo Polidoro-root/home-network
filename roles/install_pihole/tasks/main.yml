@@ -1,4 +1,23 @@
 ---
+- name: enable resolvconf
+  ansible.builtin.systemd_service:
+    state: started
+    enabled: true
+    name: resolvconf
+
+- name: copy resolvconf head
+  copy:
+    owner: root
+    src: head
+    dest: /etc/resolvconf/resolv.conf.d/head
+
+- name: reload resolvconf
+  ansible.builtin.systemd_service:
+    state: started
+    enabled: true
+    daemon_reload: true
+    name: resolvconf
+
 - name: enable http port
   community.general.ufw:
     rule: allow
@@ -26,9 +45,9 @@
 - name: uncomment DNS stub listener
   ansible.builtin.command: sed -i 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf
 
-- name: restart systemd-resolve
+- name: start systemd-resolve
   ansible.builtin.systemd_service:
-    state: restarted
+    state: started
     daemon_reload: true
     name: systemd-resolved
 
@@ -40,7 +59,7 @@
     network_mode: host
     env:
       TZ: America/Sao_Paulo
-      PIHOLE_DNS_: 127.0.0.1#5053
+      PIHOLE_DNS_: "{{ pihole_dns }}"
       WEBPASSWORD: "{{ pihole_webpassword }}"
       WEBTHEME: default-darker
     volumes:
@@ -48,4 +67,15 @@
       - "/home/{{ ansible_user }}/etc-dnsmasq.d:/etc/dnsmasq.d"
     capabilities:
       - NET_ADMIN
+    restart_policy: unless-stopped
+
+- name: run pihole prometheus exporter container
+  docker_container:
+    state: started
+    name: pihole-exporter
+    image: ekofr/pihole-exporter:latest
+    network_mode: host
+    env:
+      PIHOLE_HOSTNAME: localhost
+      PIHOLE_PASSWORD: "{{ pihole_webpassword }}"
     restart_policy: unless-stopped

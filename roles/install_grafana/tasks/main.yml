@@ -1,2 +1,89 @@
 ---
-# tasks file for install_grafana
+- name: install grafana gpg key
+  apt_key:
+    url: https://apt.grafana.com/gpg.key
+    state: present
+
+- name: Add grafana repository
+  apt_repository:
+    repo: deb https://apt.grafana.com stable main
+    state: present
+
+- name: install grafana
+  apt:
+    name:
+      - grafana
+    update_cache: true
+    state: present
+
+- name: start grafana
+  ansible.builtin.systemd_service:
+    state: started
+    enabled: true
+    daemon_reload: true
+    name: grafana-server
+
+- name: allow rule for main access point
+  community.general.ufw:
+    rule: allow
+    from_ip: "{{ grafana_access_point_ip }}"
+    to_ip: "{{ ansible_default_ipv4.address }}"
+    to_port: 3000
+    proto: tcp
+
+- name: setup grafana prometheus datasource
+  community.grafana.grafana_datasource:
+    name: Prometheus
+    uid: prometheus
+    ds_type: prometheus
+    ds_url: "{{ prometheus_url }}"
+    state: present
+    url: "{{ grafana_url }}"
+    url_password: "{{ grafana_admin_password }}"
+    url_username: "{{ grafana_admin_username }}"
+    is_default: true
+
+# - name: Import Grafana dashboard Node Exporter Full
+#   ignore_errors: true
+#   community.grafana.grafana_dashboard:
+#     url: "{{ grafana_url }}"
+#     url_password: "{{ grafana_admin_password }}"
+#     url_username: "{{ grafana_admin_username }}"
+#     dashboard_id: 1860
+#   register: node_exporter
+#
+# - name: node exporter uid
+#   debug:
+#     msg: "{{ node_exporter.uid }}"
+#
+# - name: Import Grafana dashboard Pihole
+#   ignore_errors: true
+#   community.grafana.grafana_dashboard:
+#     url: "{{ grafana_url }}"
+#     url_password: "{{ grafana_admin_password }}"
+#     url_username: "{{ grafana_admin_username }}"
+#     dashboard_id: 10176
+#   register: pihole
+#
+# - name: pihole uid
+#   debug:
+#     msg: "{{ pihole.uid }}"
+#
+# - name: Import Grafana dashboard Cloudflared
+#   ignore_errors: true
+#   community.grafana.grafana_dashboard:
+#     url: "{{ grafana_url }}"
+#     url_password: "{{ grafana_admin_password }}"
+#     url_username: "{{ grafana_admin_username }}"
+#     dashboard_id: 17457
+#   register: cloudflared
+#
+# - name: cloudflared uid
+#   debug:
+#     msg: "{{ cloudflared.uid }}"
+
+- name: Add grafana piechart panel plugin
+  community.grafana.grafana_plugin:
+    name: grafana-piechart-panel
+    version: latest
+    state: present
