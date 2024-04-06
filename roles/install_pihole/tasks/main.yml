@@ -1,0 +1,51 @@
+---
+- name: enable http port
+  community.general.ufw:
+    rule: allow
+    port: 80
+    proto: tcp
+
+- name: enable dns tcp port
+  community.general.ufw:
+    rule: allow
+    port: 53
+    proto: tcp
+
+- name: enable dns udp port
+  community.general.ufw:
+    rule: allow
+    port: 53
+    proto: udp
+
+- name: enable ipv6 range rule
+  community.general.ufw:
+    rule: allow
+    port: 546:547
+    proto: udp
+
+- name: uncomment DNS stub listener
+  ansible.builtin.command: sed -i 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf
+
+- name: restart systemd-resolve
+  ansible.builtin.systemd_service:
+    state: restarted
+    daemon_reload: true
+    name: systemd-resolved
+
+- name: run pihole docker container
+  docker_container:
+    state: started
+    name: pihole
+    image: pihole/pihole:latest
+    network_mode: host
+    env:
+      TZ: America/Sao_Paulo
+      PIHOLE_DNS_: 127.0.0.1#5053
+      WEBPASSWORD: "{{ pihole_webpassword }}"
+      WEBTHEME: default-darker
+    volumes:
+      - "/home/{{ ansible_user }}/pihole:/etc/pihole"
+      - "/home/{{ ansible_user }}/etc-dnsmasq.d:/etc/dnsmasq.d"
+    capabilities:
+      - NET_ADMIN
+    restart_policy: unless-stopped
