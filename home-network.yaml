@@ -1,0 +1,9 @@
+---
+- hosts: debian
+  become: yes
+  roles:
+    - podman
+    - docker
+    - firewall
+    - cloudflared
+    - pihole

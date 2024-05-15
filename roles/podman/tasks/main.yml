@@ -1,0 +1,9 @@
+---
+- name: install podman dependencies
+  apt:
+    name:
+      - podman
+      - podman-compose
+    state: present
+    update_cache: yes
+

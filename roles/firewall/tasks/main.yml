@@ -1,0 +1,18 @@
+---
+- name: install firewall
+  apt:
+    name:
+      - ufw
+    state: present
+    update_cache: yes
+
+
+- name: enable ssh port
+  community.general.ufw:
+    rule: allow
+    port: "{{ ufw_ssh_port }}"
+    proto: tcp
+    direction: in
+    from_ip: "{{ ufw_ssh_from_ip }}"
+    state: enabled
+    to_ip: "{{ ufw_ssh_to_ip }}"

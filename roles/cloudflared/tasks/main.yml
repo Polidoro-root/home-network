@@ -1,0 +1,43 @@
+---
+- name: enable dns tcp port
+  community.general.ufw:
+    rule: allow
+    port: 53
+    proto: tcp
+    route: true
+
+- name: enable dns udp port
+  community.general.ufw:
+    rule: allow
+    port: 53
+    proto: udp
+    route: true
+
+- name: enable ipv6 range rule
+  community.general.ufw:
+    rule: allow
+    port: 546:547
+    proto: udp
+    route: true
+
+- name: enable firewall
+  community.general.ufw:
+    state: enabled
+
+# - name: uncomment DNS stub listener
+#   ansible.builtin.command: sed -i 's/#DNSStubListener=yes/DNSStubListener=no/' /etc/systemd/resolved.conf
+
+- name: run cloudflared container
+  docker_container:
+    name: cloudflared
+    debug: true
+    state: started
+    image: docker.io/cloudflare/cloudflared:latest
+    command: proxy-dns
+    network_mode: host
+    env:
+      TUNNEL_DNS_UPSTREAM: "https://1.1.1.1/dns-query,https://1.0.0.1/dns-query"
+      TUNNEL_DNS_PORT: "5053"
+      TUNNEL_DNS_ADDRESS: "0.0.0.0"
+      TUNNEL_METRICS: "{{ cloudflared_metrics }}"
+    restart_policy: unless-stopped

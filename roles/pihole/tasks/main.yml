@@ -1,0 +1,18 @@
+---
+- name: run pihole docker container
+  docker_container:
+    state: started
+    name: pihole
+    image: docker.io/pihole/pihole:latest
+    network_mode: host
+    env:
+      DNSMASQ_USER: pihole
+      TZ: America/Sao_Paulo
+      PIHOLE_DNS_: 127.0.0.1#5053
+      WEBTHEME: default-darker
+      WEBPASSWORD: "{{ pihole_webpassword }}"
+      WEB_PORT: "{{ pihole_webport }}"
+    volumes:
+      - "/home/{{ ansible_user }}/pihole:/etc/pihole"
+      - "/home/{{ ansible_user }}/etc-dnsmasq.d:/etc/dnsmasq.d"
+    restart_policy: unless-stopped

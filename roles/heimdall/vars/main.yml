@@ -1,0 +1,3 @@
+---
+# vars file for heimdall
+heimdall_path: "/home/{{ ansible_user }}/heimdall"
