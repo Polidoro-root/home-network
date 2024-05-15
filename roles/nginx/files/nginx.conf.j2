@@ -1,0 +1,46 @@
+events {
+	worker_connections  1024;
+}
+
+http {
+	gzip on;
+	gzip_vary on;
+
+	server {
+		listen 80;
+		listen [::]:80;
+		server_name debian.local;
+
+		location / {
+			proxy_pass http://localhost:8080/;
+			proxy_http_version  1.1;
+			proxy_cache_bypass  $http_upgrade;
+
+			proxy_set_header Upgrade           $http_upgrade;
+			proxy_set_header Connection        "upgrade";
+			proxy_set_header Host              $host;
+			proxy_set_header X-Real-IP         $remote_addr;
+			proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+			proxy_set_header X-Forwarded-Proto $scheme;
+			proxy_set_header X-Forwarded-Host  $host;
+			proxy_set_header X-Forwarded-Port  $server_port;
+		}
+
+		location /pihole/ {
+			proxy_pass http://localhost:{{ pihole_webport }}/;
+			proxy_http_version  1.1;
+			proxy_cache_bypass  $http_upgrade;
+
+			proxy_set_header Upgrade           $http_upgrade;
+			proxy_set_header Connection        "upgrade";
+			proxy_set_header Host              $host;
+			proxy_set_header X-Real-IP         $remote_addr;
+			proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+			proxy_set_header X-Forwarded-Proto $scheme;
+			proxy_set_header X-Forwarded-Host  $host;
+			proxy_set_header X-Forwarded-Port  $server_port;
+		}
+	}
+}
+
+pid /run/nginx.pid;

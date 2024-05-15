@@ -1,48 +1,16 @@
 ---
-- name: include vars
-  include_vars: main.yaml
-
-# - name: create heimdall directory
-#   ansible.builtin.file:
-#     path: "{{ heimdall_path }}"
-#     state: directory
-#
-# - name: create heimdall apps directory
-#   ansible.builtin.file:
-#     path: "{{ heimdall_path }}/apps"
-#     state: directory
-#
-# - name: download heimdall apps
-#   ansible.builtin.uri:
-#     url: "{{ item.value }}"
-#     method: GET
-#     dest: "{{ heimdall_path }}/apps/{{ item.key }}.zip"
-#   loop: "{{ apps | dict2items }}"
-#   vars:
-#     apps:
-#       pihole: https://apps.heimdall.site/applications/download/b89920409bdce40e08ba1023480b0546061cd577/enhanced
-#       grafana: https://apps.heimdall.site/applications/download/f519bce8b0ae84d8dbbc0a793bf6a180043be855/foundation
-#
-# - name: unzip heimdall apps
-#   ansible.builtin.unarchive:
-#     src: "{{ heimdall_path }}/apps/{{ item }}.zip"
-#     dest: "{{ heimdall_path }}/apps/{{ item }}"
-#   loop:
-#     - pihole
-#     - grafana
-
-- name: run heimdall docker container
+- name: run heimdall container
   docker_container:
     state: started
     name: heimdall
     image: lscr.io/linuxserver/heimdall:latest
-    network_mode: host
+    ports:
+      - "8080:80/tcp"
+      - "8443:443/tcp"
     env:
-      PUID: 1000
-      PGID: 1000
+      PUID: "1000"
+      PGID: "1000"
       TZ: America/Sao_Paulo
     volumes:
       - "{{ heimdall_path }}/config:/config"
-    capabilities:
-      - NET_RAW
     restart_policy: unless-stopped

@@ -16,3 +16,38 @@
     from_ip: "{{ ufw_ssh_from_ip }}"
     state: enabled
     to_ip: "{{ ufw_ssh_to_ip }}"
+
+- name: enable http port
+  community.general.ufw:
+    rule: allow
+    port: 80
+    proto: tcp
+
+- name: enable https port
+  community.general.ufw:
+    rule: allow
+    port: 443
+    proto: tcp
+
+- name: enable dns tcp port
+  community.general.ufw:
+    rule: allow
+    port: 53
+    proto: tcp
+
+- name: enable dns udp port
+  community.general.ufw:
+    rule: allow
+    port: 53
+    proto: udp
+
+- name: enable ipv6 range rule
+  community.general.ufw:
+    rule: allow
+    port: 546:547
+    proto: udp
+
+- name: enable firewall
+  community.general.ufw:
+    state: enabled
+

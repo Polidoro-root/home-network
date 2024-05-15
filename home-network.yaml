@@ -7,3 +7,5 @@
     - firewall
     - cloudflared
     - pihole
+    - heimdall
+    - nginx
