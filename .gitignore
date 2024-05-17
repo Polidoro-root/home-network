@@ -2,3 +2,6 @@ vault.yaml
 vault_password_file.txt
 hosts
 roles/install_pihole/files
+*.key
+*.crt
+*.pem

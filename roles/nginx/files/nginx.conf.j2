@@ -7,9 +7,28 @@ http {
 	gzip_vary on;
 
 	server {
-		listen 80;
-		listen [::]:80;
+		listen 443 ssl;
+		listen [::]:443 ssl;
+
 		server_name debian.local;
+
+		ssl_certificate {{ nginx_certificate_dest }};
+		ssl_certificate_key {{ nginx_key_dest }};
+		ssl_protocols TLSv1.2 TLSv1.3;
+		ssl_session_timeout 1d;
+    		ssl_session_cache shared:SSL:10m; 
+		ssl_session_tickets off;
+		ssl_prefer_server_ciphers on;
+
+		# HSTS (ngx_http_headers_module is required) (63072000 seconds)
+		add_header Strict-Transport-Security "max-age=63072000" always;
+
+	    	# OCSP stapling
+		ssl_stapling on;
+		ssl_stapling_verify on;
+
+		# verify chain of trust of OCSP response using Root CA and Intermediate certs
+    		ssl_trusted_certificate {{ nginx_certificate_dest }}; 
 
 		location / {
 			proxy_pass http://localhost:8080/;
