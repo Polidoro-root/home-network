@@ -43,7 +43,12 @@
   docker_container:
     name: nginx
     image: docker.io/nginx:alpine
-    network_mode: host
+    network_mode: bridge
+    networks:
+      - name: media
+    ports:
+      - '443:443/tcp'
+      - '80:80/tcp'
     volumes:
       - "{{ nginx_certificate_dest }}:{{ nginx_certificate_dest }}"
       - "{{ nginx_key_dest }}:{{ nginx_key_dest }}"

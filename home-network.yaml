@@ -7,4 +7,5 @@
     - cloudflared
     - pihole
     - heimdall
+    - media
     - nginx
