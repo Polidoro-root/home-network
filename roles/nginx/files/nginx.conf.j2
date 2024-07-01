@@ -6,16 +6,16 @@ http {
 	gzip on;
 	gzip_vary on;
 
-	#ssl_certificate {{ nginx_certificate_dest }};
-	#ssl_certificate_key {{ nginx_key_dest }};
-	#ssl_protocols TLSv1.2 TLSv1.3;
-	#ssl_session_timeout 1d;
-	#ssl_session_cache shared:SSL:10m; 
-	#ssl_session_tickets off;
-	#ssl_prefer_server_ciphers on;
+	# ssl_certificate {{ nginx_certificate_dest }};
+	# ssl_certificate_key {{ nginx_key_dest }};
+	# ssl_protocols TLSv1.2 TLSv1.3;
+	# ssl_session_timeout 1d;
+	# ssl_session_cache shared:SSL:10m; 
+	# ssl_session_tickets off;
+	# ssl_prefer_server_ciphers on;
 
 	# HSTS (ngx_http_headers_module is required) (63072000 seconds)
-	add_header Strict-Transport-Security "max-age=63072000" always;
+	# add_header Strict-Transport-Security "max-age=63072000" always;
 
 	# OCSP stapling
 	# ssl_stapling on;
@@ -36,12 +36,12 @@ http {
 	proxy_set_header X-Forwarded-Port  $server_port;
 
 	server {
-		listen 80;
+		listen 80 default_server;
 		listen [::]:80;
 
 		server_name debian.local;
 		location / {
-			proxy_pass http://heimdall:80/;
+			proxy_pass http://127.0.0.1:9000/;
 		}
 	}
 
@@ -55,105 +55,6 @@ http {
 		}
 	}
 
-	server {
-		listen 80;
-		listen [::]:80;
-
-		server_name qbittorrent.debian.local;
-		location / {
-			proxy_pass http://qbittorrent:8080/;
-		}
-	}
-
-	server {
-		listen 80;
-		listen [::]:80;
-
-		server_name jackett.debian.local;
-		location / {
-			proxy_pass http://jackett:9117/;
-		}
-	}
-
-	server {
-		listen 80;
-		listen [::]:80;
-
-		server_name bazarr.debian.local;
-		location / {
-			proxy_pass http://bazarr:6767/;
-		}
-	}
-
-	server {
-		listen 80;
-		listen [::]:80;
-
-		server_name overseerr.debian.local;
-		location / {
-			proxy_pass http://overseerr:5055/;
-		}
-	}
-
-	server {
-		listen 80;
-		listen [::]:80;
-
-		server_name prowlarr.debian.local;
-		location / {
-			proxy_pass http://prowlarr:9696/;
-		}
-	}
-
-	server {
-		listen 80;
-		listen [::]:80;
-
-		server_name flaresolverr.debian.local;
-		location / {
-			proxy_pass http://flaresolverr:8191/;
-		}
-	}
-
-	server {
-		listen 80;
-		listen [::]:80;
-
-		server_name sabnzbd.debian.local;
-		location / {
-			proxy_pass http://sabnzbd:8080/;
-		}
-	}
-
-	server {
-		listen 80;
-		listen [::]:80;
-
-		server_name radarr.debian.local;
-		location / {
-			proxy_pass http://radarr:7878/;
-		}
-	}
-
-	server {
-		listen 80;
-		listen [::]:80;
-
-		server_name sonnarr.debian.local;
-		location / {
-			proxy_pass http://sonarr:8989/;
-		}
-	}
-
-	server {
-		listen 80;
-		listen [::]:80;
-
-		server_name plex.debian.local;
-		location / {
-			proxy_pass http://plex:32400/;
-		}
-	}
 }
 
 pid /run/nginx.pid;

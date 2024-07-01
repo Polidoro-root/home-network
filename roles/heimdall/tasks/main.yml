@@ -4,8 +4,9 @@
     state: started
     name: heimdall
     image: lscr.io/linuxserver/heimdall:latest
-    networks:
-      - name: media
+    network_mode: bridge
+    ports:
+      - '9000:80/tcp'
     env:
       PUID: "1000"
       PGID: "1000"
