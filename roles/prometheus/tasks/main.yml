@@ -1,2 +1,27 @@
 ---
-# tasks file for prometheus
+- name: create prometheus directories
+  file:
+    state: directory
+    path: "/home/{{ ansible_user }}/prometheus"
+    owner: "root"
+    mode: 0664
+
+- name: copy prometheus.yaml
+  copy:
+    src: prometheus.yaml
+    dest: "/home/{{ ansible_user }}/prometheus/prometheus.yaml"
+    mode: 0664
+    owner: "{{ ansible_user }}"
+
+- name: run prometheus docker container
+  docker_container:
+    state: started
+    name: prometheus
+    image: prom/prometheus:v2.45.6
+    network_mode: host
+    command: "--config.file=/etc/prometheus/prometheus.yaml --storage.tsdb.path=/prometheus --storage.tsdb.retention.time=7d"
+    volumes:
+      - "/home/{{ ansible_user }}/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml"
+      - "/home/{{ ansible_user }}/prometheus/data:/prometheus"
+    restart_policy: unless-stopped
+    
