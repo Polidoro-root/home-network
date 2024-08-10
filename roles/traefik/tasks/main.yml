@@ -1,0 +1,42 @@
+---
+- name: create traefik directory
+  file:
+    state: directory
+    path: "/home/{{ ansible_user }}/traefik"
+    owner: "root"
+    mode: 0755
+
+- name: copy traefik.yaml
+  copy:
+    src: traefik.yaml
+    dest: "/home/{{ ansible_user }}/traefik/traefik.yaml"
+    mode: 0664
+    owner: "{{ ansible_user }}"
+
+- name: copy dynamic.yaml
+  copy:
+    src: dynamic.yaml
+    dest: "/home/{{ ansible_user }}/traefik/dynamic.yaml"
+    mode: 0664
+    owner: "{{ ansible_user }}"
+
+- name: Create acme.json file
+  ansible.builtin.file:
+    path: "/home/{{ ansible_user }}/traefik/acme.json"
+    state: touch
+    mode: '0600'
+    access_time: preserve
+    modification_time: preserve
+
+- name: run traefik container
+  docker_container:
+    state: started
+    name: traefik
+    image: docker.io/traefik:v3.1
+    network_mode: host
+    restart_policy: unless-stopped
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/home/{{ ansible_user }}/traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro"
+      - "/home/{{ ansible_user }}/traefik/dynamic.yaml:/etc/traefik/dynamic.yaml:ro"
+      - "/home/{{ ansible_user }}/traefik/letsencrypt:/letsencrypt"

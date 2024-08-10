@@ -1,0 +1,39 @@
+http:
+  services:
+    traefik:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8080/"
+    heimdall:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:9000/"
+    grafana:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:3000/"
+    pihole:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8000/"
+  routers:
+    heimdall:
+      rule: "Host(`debian.local`)"
+      service: heimdall
+      tls:
+        certResolver: myresolver
+    traefik:
+      rule: "Host(`traefik.debian.local`)"
+      service: traefik
+      tls:
+        certResolver: myresolver
+    grafana:
+      rule: "Host(`grafana.debian.local`)"
+      service: grafana
+      tls:
+        certResolver: myresolver
+    pihole:
+      rule: "Host(`pihole.debian.local`)"
+      service: pihole
+      tls:
+        certResolver: myresolver

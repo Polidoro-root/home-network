@@ -1,2 +1,27 @@
 ---
-# tasks file for grafana
+- name: create grafana directories
+  file:
+    state: directory
+    path: "/home/{{ ansible_user }}/grafana"
+    owner: "root"
+    mode: 0755
+
+
+- name: create grafana datasources directories
+  file:
+    state: directory
+    path: "/home/{{ ansible_user }}/grafana/datasources"
+    owner: "{{ ansible_user }}"
+    mode: 0664
+
+- name: run grafana docker container
+  docker_container:
+    state: started
+    name: grafana
+    image: grafana/grafana:11.1.0
+    user: 0
+    network_mode: host
+    volumes:
+      - "/home/{{ ansible_user }}/grafana/data:/var/lib/grafana"
+    restart_policy: unless-stopped
+    

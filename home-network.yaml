@@ -7,5 +7,7 @@
     - cloudflared
     - pihole
     - heimdall
-    - nginx
+    - prometheus.prometheus.node_exporter
     - prometheus
+    - grafana
+    - traefik
