@@ -5,7 +5,6 @@
 - name: run cloudflared container
   docker_container:
     name: cloudflared
-    debug: true
     state: started
     image: docker.io/cloudflare/cloudflared:latest
     command: proxy-dns

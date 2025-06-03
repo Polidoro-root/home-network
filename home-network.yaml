@@ -2,12 +2,13 @@
 - hosts: debian
   become: yes
   roles:
-    - docker
-    - firewall
-    - cloudflared
-    - pihole
-    - heimdall
-    - prometheus.prometheus.node_exporter
-    - prometheus
-    - grafana
-    - traefik
+    - k0s
+    # - docker
+    # - firewall
+    # - cloudflared
+    # - pihole
+    # - heimdall
+    # - prometheus.prometheus.node_exporter
+    # - prometheus
+    # - grafana
+    # - traefik

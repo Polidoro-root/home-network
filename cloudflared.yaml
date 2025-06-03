@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflared
+  template:
+    metadata:
+      labels:
+        app: cloudflared
+    spec:
+      hostNetwork: true  # Same as network_mode: host
+      dnsPolicy: ClusterFirstWithHostNet  # Required when hostNetwork: true
+      containers:
+        - name: cloudflared
+          image: docker.io/cloudflare/cloudflared:latest
+          command: ["cloudflared", "proxy-dns"]
+          env:
+            - name: TUNNEL_DNS_UPSTREAM
+              value: "https://1.1.1.1/dns-query,https://1.0.0.1/dns-query"
+            - name: TUNNEL_DNS_PORT
+              value: "5053"
+            - name: TUNNEL_DNS_ADDRESS
+              value: "0.0.0.0"
+            - name: TUNNEL_METRICS
+              value: localhost:60123
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+      restartPolicy: Always

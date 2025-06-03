@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole
+  template:
+    metadata:
+      labels:
+        app: pihole
+    spec:
+      hostNetwork: true  # Equivalent to network_mode: host
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: pihole
+          image: docker.io/pihole/pihole:latest
+          env:
+            - name: DNSMASQ_USER
+              value: "pihole"
+            - name: TZ
+              value: "America/Sao_Paulo"
+            - name: FTLCONF_dns_revServers
+              value: "true,192.168.0.0/16,192.168.0.1,lan"
+            - name: FTLCONF_dns_upstreams
+              value: "127.0.0.1#5053"
+            - name: FTLCONF_webserver_api_password
+              valueFrom:
+                secretKeyRef:
+                  name: pihole-secret
+                  key: WEBPASSWORD
+            - name: FTLCONF_webserver_port
+              value: "8000"
+            - name: PIHOLE_DNS_
+              value: "127.0.0.1#5053"
+            - name: WEBTHEME
+              value: "default-darker"
+          volumeMounts:
+            - name: etc-pihole
+              mountPath: /etc/pihole
+            - name: etc-dnsmasq
+              mountPath: /etc/dnsmasq.d
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN", "SYS_TIME", "SYS_NICE"]
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+      volumes:
+        - name: etc-pihole
+          hostPath:
+            path: /home/polidoro/pihole
+            type: Directory
+        - name: etc-dnsmasq
+          hostPath:
+            path: /home/polidoro/etc-dnsmasq.d
+            type: Directory
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pihole-secret
+type: Opaque
+stringData:
+  WEBPASSWORD: "piholepass"
+

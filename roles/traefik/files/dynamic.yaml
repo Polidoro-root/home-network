@@ -16,10 +16,10 @@ http:
       loadBalancer:
         servers:
           - url: "http://127.0.0.1:8000/"
-    microk8s:
+    minikube:
       loadBalancer:
         servers:
-          - url: "http://192.168.49.2:8443"
+          - url: "https://192.168.49.2:8443"
   routers:
     heimdall:
       rule: "Host(`debian.local`)"
@@ -41,8 +41,8 @@ http:
       service: pihole
       tls:
         certResolver: myresolver
-    microk8s:
-      rule: "Host(`microk8s.debian.local`)"
-      service: microk8s
+    minikube:
+      rule: "Host(`minikube.debian.local`)"
+      service: minikube
       tls:
         certResolver: myresolver
