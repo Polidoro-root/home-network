@@ -60,12 +60,3 @@ spec:
             path: /home/polidoro/etc-dnsmasq.d
             type: Directory
       restartPolicy: Always
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: pihole-secret
-type: Opaque
-stringData:
-  WEBPASSWORD: "piholepass"
-
